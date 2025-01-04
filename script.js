@@ -19,6 +19,10 @@ const PADDLE_OFFSET = 10;
 let leftPaddleTop = 10;
 let rightPaddleTop = 30;
 
+document.addEventListener("mousemove", (e) => {
+  rightPaddleTop = e.y - canvas.offsetTop;
+});
+
 function draw() {
   //fill the canvas with black
   ctx.fillStyle = "black";
