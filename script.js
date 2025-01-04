@@ -1,7 +1,10 @@
-let canvas = document.querySelector("#canvas");
+let canvas = document.querySelector("canvas");
 let ctx = canvas.getContext("2d");
 let width = canvas.width;
 let height = canvas.height;
+
+ctx.fillStyle = "black";
+ctx.fillRect(0, 0, width, height);
 
 const BALL_SIZE = 5;
 let ballPosition = { x: 20, y: 30 };
@@ -17,25 +20,23 @@ let leftPaddleTop = 10;
 let rightPaddleTop = 30;
 
 function draw() {
-  //Fill the canvas with black
+  //fill the canvas with black
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, width, height);
-
-  //Everything else will be white
+  //everything else will be white
   ctx.fillStyle = "white";
-  //Draw the ball
+  //draw the ball
   ctx.fillRect(ballPosition.x, ballPosition.y, BALL_SIZE, BALL_SIZE);
+
+  //draw the paddles
+  ctx.fillRect(PADDLE_OFFSET, leftPaddleTop, PADDLE_WIDTH, PADDLE_HEIGHT);
+  ctx.fillRect(
+    width - PADDLE_WIDTH - PADDLE_OFFSET,
+    rightPaddleTop,
+    PADDLE_WIDTH,
+    PADDLE_HEIGHT
+  );
 }
-
-//Draw the paddles
-ctx.fillRect(PADDLE_OFFSET, leftPaddleTop, PADDLE_WIDTH, PADDLE_HEIGHT);
-
-ctx.fillRect(
-  width - PADDLE_WIDTH - PADDLE_OFFSET,
-  rightPaddleTop,
-  PADDLE_WIDTH,
-  PADDLE_HEIGHT
-);
 
 function update() {
   ballPosition.x += xSpeed;
@@ -49,7 +50,6 @@ function checkCollision() {
     top: ballPosition.y,
     bottom: ballPosition.y + BALL_SIZE,
   };
-
   if (ball.left < 0 || ball.right > width) {
     xSpeed = -xSpeed;
   }
@@ -62,7 +62,7 @@ function gameLoop() {
   draw();
   update();
   checkCollision();
-  //Call this function again after a timeout
+  //Call this function again a timeout
   setTimeout(gameLoop, 30);
 }
 
