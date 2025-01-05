@@ -79,6 +79,16 @@ function checkCollision() {
     bottom: rightPaddleTop + PADDLE_HEIGHT,
   };
 
+  if (checkPaddleCollision(ball, leftPaddle)) {
+    //Left paddle collision happened
+    xSpeed = Math.abs(xSpeed);
+  }
+
+  if (checkPaddleCollision(ball, rightPaddle)) {
+    //Right paddle collision happened
+    xSpeed = -Math.abs(xSpeed);
+  }
+
   if (ball.left < 0 || ball.right > width) {
     xSpeed = -xSpeed;
   }
