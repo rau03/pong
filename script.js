@@ -6,11 +6,19 @@ let height = canvas.height;
 ctx.fillStyle = "black";
 ctx.fillRect(0, 0, width, height);
 
-const BALL_SIZE = 5;
-let ballPosition = { x: 20, y: 30 };
+const MAX_COMPUTER_SPEED = 2;
 
-let xSpeed = 4;
-let ySpeed = 2;
+const BALL_SIZE = 5;
+let ballPosition;
+
+let xSpeed;
+let ySpeed;
+
+function initBall() {
+  ballPosition = { x: 20, y: 30 };
+  xSpeed = 4;
+  ySpeed = 2;
+}
 
 const PADDLE_WIDTH = 5;
 const PADDLE_HEIGHT = 20;
@@ -30,13 +38,16 @@ function draw() {
   //fill the canvas with black
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, width, height);
-  //everything else will be white
+
+  //Everything else will be white
   ctx.fillStyle = "white";
+
   //draw the ball
   ctx.fillRect(ballPosition.x, ballPosition.y, BALL_SIZE, BALL_SIZE);
 
   //draw the paddles
   ctx.fillRect(PADDLE_OFFSET, leftPaddleTop, PADDLE_WIDTH, PADDLE_HEIGHT);
+
   ctx.fillRect(
     width - PADDLE_WIDTH - PADDLE_OFFSET,
     rightPaddleTop,
@@ -52,9 +63,27 @@ function draw() {
   ctx.fillText(rightScore.toString(), width - 50, 50);
 }
 
+function followBall() {
+  let ball = {
+    top: ballPosition.y,
+    bottom: ballPosition.y + BALL_SIZE,
+  };
+  let leftPaddle = {
+    top: leftPaddleTop,
+    bottom: leftPaddleTop + PADDLE_HEIGHT,
+  };
+
+  if (ball.top < leftPaddle.top) {
+    leftPaddleTop -= MAX_COMPUTER_SPEED;
+  } else if (ball.bottom > leftPaddle.bottom) {
+    leftPaddleTop += MAX_COMPUTER_SPEED;
+  }
+}
+
 function update() {
   ballPosition.x += xSpeed;
   ballPosition.y += ySpeed;
+  followBall();
 }
 
 function checkPaddleCollision(ball, paddle) {
@@ -68,7 +97,7 @@ function checkPaddleCollision(ball, paddle) {
 }
 
 function adjustAngle(distanceFromTop, distanceFromBottom) {
-  if (distanceFromTop < 5) {
+  if (distanceFromTop < 0) {
     //If ball hit near top of paddle, reduce ySpeed
     ySpeed -= 0.5;
   } else if (distanceFromBottom < 0) {
@@ -115,6 +144,15 @@ function checkCollision() {
     xSpeed = -Math.abs(xSpeed);
   }
 
+  if (ball.left < 0) {
+    rightScore++;
+    initBall();
+  }
+  if (ball.right > width) {
+    leftScore++;
+    initBall();
+  }
+
   if (ball.left < 0 || ball.right > width) {
     xSpeed = -xSpeed;
   }
@@ -131,4 +169,5 @@ function gameLoop() {
   setTimeout(gameLoop, 30);
 }
 
+initBall();
 gameLoop();
