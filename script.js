@@ -1,10 +1,7 @@
 let canvas = document.querySelector("canvas");
 let ctx = canvas.getContext("2d");
-let width = canvas.width;
-let height = canvas.height;
-
-ctx.fillStyle = "black";
-ctx.fillRect(0, 0, width, height);
+let width = (canvas.width = 600);
+let height = (canvas.height = 400);
 
 const MAX_COMPUTER_SPEED = 2;
 
@@ -15,13 +12,13 @@ let xSpeed;
 let ySpeed;
 
 function initBall() {
-  ballPosition = { x: 20, y: 30 };
-  xSpeed = 4;
-  ySpeed = 2;
+  ballPosition = { x: width / 2, y: height / 2 };
+  xSpeed = (Math.random() > 0.5 ? 1 : -1) * (2 + Math.random() * 3);
+  ySpeed = (Math.random() > 0.5 ? 1 : -1) * (2 + Math.random() * 3);
 }
 
-const PADDLE_WIDTH = 5;
-const PADDLE_HEIGHT = 20;
+const PADDLE_WIDTH = 10;
+const PADDLE_HEIGHT = 40;
 const PADDLE_OFFSET = 10;
 
 let leftPaddleTop = 10;
@@ -36,19 +33,12 @@ document.addEventListener("mousemove", (e) => {
 });
 
 function draw() {
-  //fill the canvas with black
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, width, height);
 
-  //Everything else will be white
   ctx.fillStyle = "white";
-
-  //draw the ball
   ctx.fillRect(ballPosition.x, ballPosition.y, BALL_SIZE, BALL_SIZE);
-
-  //draw the paddles
   ctx.fillRect(PADDLE_OFFSET, leftPaddleTop, PADDLE_WIDTH, PADDLE_HEIGHT);
-
   ctx.fillRect(
     width - PADDLE_WIDTH - PADDLE_OFFSET,
     rightPaddleTop,
@@ -56,12 +46,9 @@ function draw() {
     PADDLE_HEIGHT
   );
 
-  //Draw scores
-  ctx.font = "30px monospace";
-  ctx.textAlign = "left";
-  ctx.fillText(leftScore.toString(), 50, 50);
-  ctx.textAlign = "right";
-  ctx.fillText(rightScore.toString(), width - 50, 50);
+  // Update the HTML score display
+  document.getElementById("left-score").textContent = leftScore;
+  document.getElementById("right-score").textContent = rightScore;
 }
 
 function followBall() {
@@ -88,7 +75,6 @@ function update() {
 }
 
 function checkPaddleCollision(ball, paddle) {
-  //check if the paddle and ball overlap vertically and horizontally
   return (
     ball.left < paddle.right &&
     ball.right > paddle.left &&
@@ -99,10 +85,8 @@ function checkPaddleCollision(ball, paddle) {
 
 function adjustAngle(distanceFromTop, distanceFromBottom) {
   if (distanceFromTop < 0) {
-    //If ball hit near top of paddle, reduce ySpeed
     ySpeed -= 0.5;
   } else if (distanceFromBottom < 0) {
-    //If ball hit near bottom of paddle, increase ySpeed
     ySpeed += 0.5;
   }
 }
@@ -130,7 +114,6 @@ function checkCollision() {
   };
 
   if (checkPaddleCollision(ball, leftPaddle)) {
-    //Left paddle collision happened
     let distanceFromTop = ball.top - leftPaddle.top;
     let distanceFromBottom = leftPaddle.bottom - ball.bottom;
     adjustAngle(distanceFromTop, distanceFromBottom);
@@ -138,14 +121,13 @@ function checkCollision() {
   }
 
   if (checkPaddleCollision(ball, rightPaddle)) {
-    //Right paddle collision happened
     let distanceFromTop = ball.top - rightPaddle.top;
     let distanceFromBottom = rightPaddle.bottom - ball.bottom;
     adjustAngle(distanceFromTop, distanceFromBottom);
     xSpeed = -Math.abs(xSpeed);
   }
 
-  if (ball.left < 0) {
+  if (ball.left <= 0) {
     rightScore++;
     initBall();
   }
@@ -153,14 +135,16 @@ function checkCollision() {
     leftScore++;
     initBall();
   }
+
   if (leftScore > 9 || rightScore > 9) {
     gameOver = true;
   }
 
-  if (ball.left < 0 || ball.right > width) {
+  if (ball.left < 0 || ball.right >= width) {
     xSpeed = -xSpeed;
   }
-  if (ball.top < 0 || ball.bottom > height) {
+
+  if (ball.top <= 0 || ball.bottom >= height) {
     ySpeed = -ySpeed;
   }
 }
@@ -177,10 +161,8 @@ function gameLoop() {
   update();
   checkCollision();
   if (gameOver) {
-    draw();
     drawGameOver();
   } else {
-    //Call this function again a timeout
     setTimeout(gameLoop, 30);
   }
 }
